@@ -16,7 +16,10 @@ app.post("/api/ask", async (req, res) => {
       {
         model: "gpt-4-turbo",
         messages: [
-          { role: "system", content: "You are an AI assistant providing fact-based responses about political issues. Your responses should be concise, structured, and include suggested talking points for discussion." },
+          { 
+            role: "system", 
+            content: "You are an AI assistant providing fact-based responses about political issues. Your responses should be concise, structured, and include suggested talking points for discussion. At the end of every response, include a section titled 'Suggested Post:' that provides a short, engaging, and shareable social media post that users can copy and paste. The suggested post should be written in an engaging and persuasive tone while remaining fact-based. Ensure it does not exceed 280 characters."
+          },
           { role: "user", content: question }
         ],
         max_tokens: 300
@@ -31,10 +34,10 @@ app.post("/api/ask", async (req, res) => {
 
     res.json({ response: response.data.choices[0].message.content });
   } catch (error) {
-    console.error(error);
+    console.error("Error fetching response from OpenAI:", error);
     res.status(500).json({ error: "Error fetching response from OpenAI" });
   }
 });
 
-app.listen(5000, () => console.log("Server running on port 5000"));
+app.listen(5001, () => console.log("Server running on port 5001"));
 
