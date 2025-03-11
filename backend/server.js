@@ -39,7 +39,7 @@ Your role is to **dispel misinformation, educate the public**, and equip users w
     const response = await axios.post(
       "https://api.openai.com/v1/chat/completions",
       {
-        model: "gpt-4.5",
+        model: "gpt-4.5-preview",
         temperature: 0.02,
         max_tokens: 800,
         messages: [
