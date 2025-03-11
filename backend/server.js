@@ -5,7 +5,11 @@ const axios = require("axios");
 
 const app = express();
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: "*", // Allow all origins (or replace with your Vercel URL)
+  methods: ["POST"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+}));
 
 app.post("/api/ask", async (req, res) => {
   try {
