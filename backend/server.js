@@ -67,9 +67,18 @@ Now, perform fact-checking for the following question:
     ) {
       const messageContent = apiResponse.data.output[0].content;
       if (Array.isArray(messageContent)) {
-        outputText = messageContent.join("");
+        outputText = messageContent
+          .map(item => {
+            if (typeof item === "object" && item !== null) {
+              return item.text ? item.text : JSON.stringify(item);
+            }
+            return item;
+          })
+          .join("");
       } else if (typeof messageContent === "object" && messageContent !== null) {
-        outputText = messageContent.text ? messageContent.text : JSON.stringify(messageContent);
+        outputText = messageContent.text
+          ? messageContent.text
+          : JSON.stringify(messageContent);
       } else {
         outputText = messageContent;
       }
