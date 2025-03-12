@@ -46,7 +46,7 @@ Your role is to **dispel misinformation, educate the public**, and equip users w
         model: "gpt-4o",
         temperature: 0.01,
         max_tokens: 800,
-        tools: [{ type: "web_search" }],
+        tools: [{ type: "web_search_preview" }],
         tool_choice: "auto",
         messages: [
           { role: "system", content: fact_checking_prompt },
