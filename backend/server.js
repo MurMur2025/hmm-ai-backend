@@ -54,8 +54,9 @@ Your role is to **dispel misinformation, educate the public**, and equip users w
         }
       }
     );
+    console.log("Full OpenAI Response:", response.data);
+    res.json({ response: response.data.output_text || "No response generated." });
 
-    res.json({ response: response.data.response });
   } catch (error) {
     console.error("Error fetching response from OpenAI:", error.response ? error.response.data : error.message);
     res.status(500).json({ error: error.response ? error.response.data : "Unknown OpenAI API error" });
