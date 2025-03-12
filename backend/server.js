@@ -36,7 +36,7 @@ Now, perform fact-checking for the following question:
 `;
 
     const apiPayload = {
-      model: "gpt-4o-2024-08-06", // Adjust the model if needed.
+      model: "gpt-4o-2024-08-06",
       tools: [
         {
           type: "web_search_preview",
@@ -68,6 +68,8 @@ Now, perform fact-checking for the following question:
       const messageContent = apiResponse.data.output[0].content;
       if (Array.isArray(messageContent)) {
         outputText = messageContent.join("");
+      } else if (typeof messageContent === "object" && messageContent !== null) {
+        outputText = messageContent.text ? messageContent.text : JSON.stringify(messageContent);
       } else {
         outputText = messageContent;
       }
@@ -75,6 +77,7 @@ Now, perform fact-checking for the following question:
       console.log("No output found in API response:", apiResponse.data);
     }
 
+    console.log("Extracted Output Text:", outputText);
     res.json({ response: outputText });
   } catch (error) {
     console.error(
