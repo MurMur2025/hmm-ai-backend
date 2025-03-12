@@ -43,13 +43,12 @@ Your role is to **dispel misinformation, educate the public**, and equip users w
     const response = await axios.post(
       "https://api.openai.com/v1/responses",
       {
-        model: "gpt-4o",
+        model: "gpt-4o-search-preview", // Correct model for web search
         temperature: 0.01,
         max_tokens: 800,
-        tools: [{
-            type: "web_search_preview"
-            search_context_size: "low"
-        }],
+        web_search_options: {
+          search_context_size: "medium", // Enables web search
+        },
         messages: [
           { role: "system", content: fact_checking_prompt },
           { role: "user", content: question }
@@ -63,7 +62,7 @@ Your role is to **dispel misinformation, educate the public**, and equip users w
       }
     );
 
-    res.json({ response: response.data.choices[0].message.content });
+    res.json({ response: response.data.response });
   } catch (error) {
     console.error("Error fetching response from OpenAI:", error.response ? error.response.data : error.message);
     res.status(500).json({ error: error.response ? error.response.data : "Unknown OpenAI API error" });
