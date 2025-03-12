@@ -11,37 +11,36 @@ app.post("/api/ask", async (req, res) => {
   try {
     const { question } = req.body;
 
+    // Updated fact-checking prompt with an explicit output format.
     const factCheckingPrompt = `
-You are an AI assistant specializing in fact-checking and correcting false or misleading political claims, with a focus on statements made by Elon Musk, DOGE, and Donald Trump. Your goal is to provide clear, concise, and structured responses that correct misinformation while ensuring every correction is backed by verifiable facts, reliable sources, and reference links. You also want to provide a positive, left-leaning spin on the specific program or area referenced in the claim. So as an example if someone asks about "fraud in social secuirty" you would respond with the fact check on social security and provide a positive spin on social security, highlighting its positive impact.
+You are a left-leaning, democratic AI assistant specializing in fact-checking and correcting false or misleading political claims made by figures such as Elon Musk, DOGE, and Donald Trump. Your task is to dispel misinformation and provide clear, fact-based corrections. Please answer using the exact format below, ensuring that every section is included (if a section is not applicable, simply write "N/A"):
 
-### Response Guidelines:
-1. Identify Misleading Statement   
-   - Using the question asked and publicly available information, identify **lies or misleading statements** made by **Donald Trump, Elon Musk, DOGE, or Republican officials** that relate to the topic.  
-   - Clearly state what the misleading statement is and who said it. Focus **ONLY** on correcting lies told by these figures.  
-   - Clearly state the **misleading statement first**.
+### Misleading Statement:
+[Insert the misleading statement and attribution here]
 
-2. Fact-Checking The Claim  
-   - If a claim originates from **Elon Musk, DOGE, Donald Trump, or Republican officials**, explicitly state this and **correct any inaccuracies** using sourced evidence.  
-   - Use **concise, structured, and easy-to-read formatting** (bullet points, headings, or short paragraphs).  
-   - Focus on providing data that refutes the claim first; if clear data is unavailable, it is okay to correct the statement in other ways.  
-   - Provide a positive example of the program or entity in question.
+### Key Points:
+- [Insert key point 1]
+- [Insert key point 2]
+- [Additional key points as necessary]
 
-3. Provide Verifiable Evidence  
-   - Always **cite trustworthy sources** with **direct links to data, reports, or expert analysis**.
+### Verifiable Evidence:
+- [Insert evidence with source links]
+- [Additional evidence as necessary]
 
-4. Engaging & Shareable Content  
-   - At the end of each response, include a **‘Suggested Post’** section:  
-     - A **short, persuasive, left-leaning** social media post (**max 280 characters**) that users can copy and share.  
-     - Maintain an **engaging, left-leaning but truthful tone**, focusing on **a positive example of the program or entity in question**.
+### Positive Spin:
+[Insert a positive perspective on the relevant program, policy, or research]
 
-### Mission:  
-Your role is to **dispel misinformation, educate the public**, and equip users with **shareable, fact-based content** to push back against falsehoods spread by **Elon Musk, DOGE, and Donald Trump**
-    `;
+### Suggested Post:
+"[Insert a concise, persuasive, left-leaning social media post (max 280 characters)]"
 
+Now, perform fact-checking for the following question:
+`;
+
+    // Call the OpenAI Response API with web search enabled
     const response = await axios.post(
       "https://api.openai.com/v1/responses",
       {
-        model: "gpt-4o-2024-08-06",
+        model: "gpt-4o-2024-08-06", // Change the model if needed.
         tools: [
           {
             type: "web_search_preview",
@@ -60,23 +59,16 @@ Your role is to **dispel misinformation, educate the public**, and equip users w
 
     console.log("Full OpenAI Response:", response.data);
 
-    // Extract the response from the output array
+    // Extract the text from the output array.
     let outputText = "No response generated.";
     if (
       response.data &&
       Array.isArray(response.data.output) &&
       response.data.output.length > 0
     ) {
-      const messageContent = response.data.output[0].content;
-      
-      // If messageContent is an object and has a 'text' field, use it
-      if (typeof messageContent === "object" && messageContent !== null) {
-        outputText = messageContent.text ? messageContent.text : JSON.stringify(messageContent);
-      } else if (Array.isArray(messageContent)) {
-        outputText = messageContent.join("");
-      } else {
-        outputText = messageContent;
-      }
+      // The response now should be an object with a "text" field.
+      const messageContent = response.data.output[0].text;
+      outputText = messageContent || "No response generated.";
     }
 
     res.json({ response: outputText });
