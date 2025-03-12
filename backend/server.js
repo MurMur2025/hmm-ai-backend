@@ -55,7 +55,8 @@ Your role is to **dispel misinformation, educate the public**, and equip users w
       }
     );
     console.log("Full OpenAI Response:", response.data);
-    res.json({ response: response.data.output_text || "No response generated." });
+    const outputText = response.data.output?.[0]?.content?.[0]?.text || "No response generated.";
+    res.json({ response: outputText });
 
   } catch (error) {
     console.error("Error fetching response from OpenAI:", error.response ? error.response.data : error.message);
