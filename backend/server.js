@@ -65,22 +65,30 @@ Now, perform fact-checking for the following question:
       Array.isArray(apiResponse.data.output) &&
       apiResponse.data.output.length > 0
     ) {
-      const messageContent = apiResponse.data.output[0].content;
-      if (Array.isArray(messageContent)) {
-        outputText = messageContent
-          .map(item => {
-            if (typeof item === "object" && item !== null) {
-              return item.text ? item.text : JSON.stringify(item);
-            }
-            return item;
-          })
-          .join("");
-      } else if (typeof messageContent === "object" && messageContent !== null) {
-        outputText = messageContent.text
-          ? messageContent.text
-          : JSON.stringify(messageContent);
+      // Find the element with type "message"
+      const messageElement = apiResponse.data.output.find(
+        (item) => item.type === "message"
+      );
+      if (messageElement && messageElement.content) {
+        const messageContent = messageElement.content;
+        if (Array.isArray(messageContent)) {
+          outputText = messageContent
+            .map((item) => {
+              if (typeof item === "object" && item !== null) {
+                return item.text ? item.text : JSON.stringify(item);
+              }
+              return item;
+            })
+            .join("");
+        } else if (typeof messageContent === "object" && messageContent !== null) {
+          outputText = messageContent.text
+            ? messageContent.text
+            : JSON.stringify(messageContent);
+        } else {
+          outputText = messageContent;
+        }
       } else {
-        outputText = messageContent;
+        console.log("No message element found in API response:", apiResponse.data.output);
       }
     } else {
       console.log("No output found in API response:", apiResponse.data);
@@ -89,10 +97,7 @@ Now, perform fact-checking for the following question:
     console.log("Extracted Output Text:", outputText);
     res.json({ response: outputText });
   } catch (error) {
-    console.error(
-      "Error fetching response from OpenAI:",
-      error.response ? error.response.data : error.message
-    );
+    console.error("Error fetching response from OpenAI:", error.response ? error.response.data : error.message);
     res.status(500).json({
       error: error.response ? error.response.data : "Unknown OpenAI API error"
     });
@@ -100,4 +105,3 @@ Now, perform fact-checking for the following question:
 });
 
 app.listen(5001, () => console.log("Server running on port 5001"));
-
