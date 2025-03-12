@@ -43,16 +43,11 @@ Your role is to **dispel misinformation, educate the public**, and equip users w
     const response = await axios.post(
       "https://api.openai.com/v1/responses",
       {
-        model: "gpt-4o-search-preview", // Correct model for web search
+        model: "gpt-4o",
         temperature: 0.01,
         max_tokens: 800,
-        web_search_options: {
-          search_context_size: "medium", // Enables web search
-        },
-        messages: [
-          { role: "system", content: fact_checking_prompt },
-          { role: "user", content: question }
-        ]
+        tools: [{ type: "web_search_preview"}],
+        input: '${fact_checking_prompt}\n\nUser Question: ${question}'
       },
       {
         headers: {
