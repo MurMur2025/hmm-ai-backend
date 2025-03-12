@@ -11,7 +11,6 @@ app.post("/api/ask", async (req, res) => {
   try {
     const { question } = req.body;
 
-    // Fact-checking prompt with response guidelines and mission
     const factCheckingPrompt = `
 You are an AI assistant specializing in fact-checking and correcting false or misleading political claims, with a focus on statements made by Elon Musk, DOGE, and Donald Trump. Your goal is to provide clear, concise, and structured responses that correct misinformation while ensuring every correction is backed by verifiable facts, reliable sources, and reference links. You also want to provide a positive, left-leaning spin on the specific program or area referenced in the claim. So as an example if someone asks about "fraud in social secuirty" you would respond with the fact check on social security and provide a positive spin on social security, highlighting its positive impact.
 
@@ -39,11 +38,10 @@ You are an AI assistant specializing in fact-checking and correcting false or mi
 Your role is to **dispel misinformation, educate the public**, and equip users with **shareable, fact-based content** to push back against falsehoods spread by **Elon Musk, DOGE, and Donald Trump**
     `;
 
-    // Call the Response API with web search enabled
     const response = await axios.post(
       "https://api.openai.com/v1/responses",
       {
-        model: "gpt-4o-2024-08-06", // Change model if needed
+        model: "gpt-4o-2024-08-06",
         tools: [
           {
             type: "web_search_preview",
@@ -70,9 +68,15 @@ Your role is to **dispel misinformation, educate the public**, and equip users w
       response.data.output.length > 0
     ) {
       const messageContent = response.data.output[0].content;
-      outputText = Array.isArray(messageContent)
-        ? messageContent.join("")
-        : messageContent;
+      
+      // If messageContent is an object and has a 'text' field, use it
+      if (typeof messageContent === "object" && messageContent !== null) {
+        outputText = messageContent.text ? messageContent.text : JSON.stringify(messageContent);
+      } else if (Array.isArray(messageContent)) {
+        outputText = messageContent.join("");
+      } else {
+        outputText = messageContent;
+      }
     }
 
     res.json({ response: outputText });
